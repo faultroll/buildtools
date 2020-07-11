@@ -12,13 +12,13 @@ ECHO	:=	echo -e
 # # # # # # # # # # # #
 #        工具链       #
 # # # # # # # # # # # #
-PRFX	:=	$(CROSS_COMPILER)
-CC		:=	$(PRFX)gcc
+PRFX		:=	$(HOST)-
+CC			:=	$(PRFX)gcc
 CXX		:=	$(PRFX)g++
-LD		:=	$(PRFX)ld
-AR		:=	$(PRFX)ar
-RANLIB	:=	$(PRFX)ranlib
-STRIP	:=	$(PRFX)strip
+LD			:=	$(PRFX)ld
+AR			:=	$(PRFX)ar
+RANLIB		:=	$(PRFX)ranlib
+STRIP		:=	$(PRFX)strip
 OBJDUMP	:=	$(PRFX)objdump
 OBJCOPY	:=	$(PRFX)objcopy
 
@@ -38,7 +38,7 @@ MAKEFLAGS		+=	-r \
 #      平台变量       #
 # # # # # # # # # # # #
 # Makefile需填充CFLAGS, CXXFLAGS, LDFLAGS
-FLAGS_COMPILE_PLAT_C	:=	$(CFLAGS)
+FLAGS_COMPILE_PLAT_C		:=	$(CFLAGS)
 FLAGS_COMPILE_PLAT_CXX	:=	$(CXXFLAGS)
 FLAGS_LINK_PLAT			:=	$(LDFLAGS)
 
@@ -49,8 +49,8 @@ FLAGS_LINK_PLAT			:=	$(LDFLAGS)
 ifndef NAME
     $(error name not defined!!!)
 endif
-LIBDY		:=	lib$(NAME).so
-LIBST		:=	lib$(NAME).a
+LIBDY			:=	lib$(NAME).so
+LIBST			:=	lib$(NAME).a
 HEX			:=	$(NAME).hex
 BIN			:=	$(NAME).bin
 ASM			:=	$(NAME).asm
@@ -62,7 +62,7 @@ DIR_INC		:=	$(realpath $(DINC))
 DIR_LIB		:=	$(realpath $(DLIB))
 DIR_OUT		:=	$(realpath $(DOUT))
 SOURCES		:=	$(realpath $(SRCS))
-LIBRARYS	:=	$(LIBS) # 不能用realpath，因为不是文件
+LIBRARYS		:=	$(LIBS) # 不能用realpath，因为不是文件
 ifndef DIR_INC
     $(warning includedir/DINC not defined/found!!!)
 endif
@@ -90,8 +90,8 @@ FLAGS_COMPILE_COMMON	+=	-Os -Wall -Wextra -Winvalid-pch -D_POSIX_C_SOURCE=200809
 							# -D_XOPEN_SOURCE=700 -D_XOPEN_SOURCE_EXTENDED
 FLAGS_COMPILE_COMMON	+=	-fPIC \
 							-ffunction-sections -fdata-sections
-FLAGS_COMPILE_C			:=	-std=c11 -Wpedantic $(FLAGS_COMPILE_PLAT_C) 
-FLAGS_COMPILE_CXX		:=	-std=c++11 -Weffc++ $(FLAGS_COMPILE_PLAT_CXX) 
+FLAGS_COMPILE_C		:=	-std=c11 -Wpedantic $(FLAGS_COMPILE_PLAT_C) 
+FLAGS_COMPILE_CXX	:=	-std=c++11 -Weffc++ $(FLAGS_COMPILE_PLAT_CXX) 
 
 # # # # # # # # # # # #
 #      链接选项       #
@@ -108,11 +108,13 @@ $(LIBDY) : $(OBJECTS)
 #	@$(CC) -shared $(FLAGS_LINK_COMMON) $(FLAGS_LINK_PLAT) -Wl,-Map=$(addsuffix .map,$@) $^ -o $@ $(LIBRARYS)
 	@$(CC) -shared $(FLAGS_LINK_COMMON) $(FLAGS_LINK_PLAT) $^ -o $@ $(LIBRARYS)
 #	@$(MV) $(addsuffix .map,$@) $(DIR_OUT)/
+	@$(STRIP) --strip-all $@
 	$(info $(CC) -shared $(notdir $^) -o $(notdir $@))
 # .A文件
 $(LIBST) : $(OBJECTS)
 	@$(AR) -crD $@ $^ # -D: reproducible build
 	@$(RANLIB) -D $@
+	@$(STRIP) --strip-unneeded $@
 	$(info $(AR) -crD $(notdir $@) $(notdir $^))
 # HEX文件
 $(HEX) : %.hex : %.bin
@@ -130,10 +132,10 @@ $(ASM) : %.asm : %.elf
 $(ELF) : $(OBJECTS)
 #	@$(CC) $(FLAGS_LINK_COMMON) $(FLAGS_LINK_PLAT) -Wl,-Map=$(addsuffix .map,$@) $^ -o $@ $(LIBRARYS)
 	@$(CC) $(FLAGS_LINK_COMMON) $(FLAGS_LINK_PLAT) $^ -o $@ $(LIBRARYS)
-	@$(STRIP) $@
+	@$(STRIP) --strip-all $@
 #	@$(MV) $(addsuffix .map,$@) $(DIR_OUT)/
 	$(info $(CC) $(notdir $^) -o $(notdir $@))
-	$(info $(STRIP) $(notdir $@))
+#	$(info $(STRIP) $(notdir $@))
 # PCH文件
 $(PCH) : %.h.gch : %.h
 	@$(CC) $(FLAGS_COMPILE_COMMON) $(FLAGS_COMPILE_C) -c $< -o $@

@@ -1,10 +1,11 @@
 
 .POSIX	:
-DCONF	:=	./
+DPRJ	:=	$(realpath ..)
+DCONF	:=	$(DPRJ)/.
 include $(DCONF)/Platform.conf
 
 ###############################################################################
-# require a better way, maybe .d 
+# require a better way, maybe .d
 all : lrbuf lmxml
 
 lrbuf :	\
@@ -19,14 +20,13 @@ $(DCUTEST)/out/CuTest.c :
 
 lmxml :	\
 			$(DLMXML)/out/libmxml.a
-$(DLMXML)/out/libmxml.a :	\
-								
+$(DLMXML)/out/libmxml.a :
 #	$(info $(DLMXML))
 	@make -j -s -C ./$(DLMXML) -f Makefile all
 
 ###############################################################################
 # require a better way
-clean : 
+clean :
 	@make -j -s -C ./$(DLRBUF) -f Makefile clean
 distclean : clean
 	@make -j -s -C ./$(DLMXML) -f Makefile clean

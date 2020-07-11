@@ -1,9 +1,10 @@
 
-DCONF	:=	../
-include $(DCONF)/Platform.conf
+DPRJ	:=	$(realpath .)
+DRULE	:=	$(DPRJ)/rule
 
 .PHONY : clean all
-all : 
-	@./build.sh "$(CROSS_COMPILER)" "make -j"
-clean : 
-	@rm ./out -rf
+all :
+	@make -j -s -C ./$(DRULE) -f lmxml.mak install
+clean :
+	@make -j -s -C ./$(DRULE) -f lmxml.mak clean
+

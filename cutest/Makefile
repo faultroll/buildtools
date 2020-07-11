@@ -1,9 +1,10 @@
 
-DCONF	:=	../
-include $(DCONF)/Platform.conf
+DPRJ	:=	$(realpath .)
+DRULE	:=	$(DPRJ)/rule
 
 .PHONY : clean all
-all : 
-	@./build.sh "$(CROSS_COMPILER)" "make -j1"
-clean : 
-	@rm ./out -rf
+all :
+	@make -j -s -C ./$(DRULE) -f cutest.mak install
+clean :
+	@make -j -s -C ./$(DRULE) -f cutest.mak clean
+

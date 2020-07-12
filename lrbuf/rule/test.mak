@@ -16,8 +16,9 @@ DINC			:=	$(shell find $(DPRJ)/inc -type d) \
 DOUT			:=	$(DPRJ)/out
 DLIB			:=	$(shell find $(DPRJ)/lib -type d) \
 					$(DOUT)
-SRCS_$(NAME)	:=	$(DCUTEST)/out/CuTest.c test.c main.c
+SRCS_$(NAME)	:=	test.c main.c
 SRCS			:=	$(foreach file,$(SRCS_$(NAME)),$(wildcard $(DSRC)/$(file)))
+SRCS			+=	$(DCUTEST)/out/CuTest.c
 LIBS			:=	-Wl,-Bstatic \
 					 \
 					-Wl,--start-group \
@@ -58,5 +59,5 @@ include $(DCONF)/Rules.mak
 test : 
 	@$(DCUTEST)/out/make-tests.sh $(DSRC)/test.c > $(DSRC)/main.c
 testclean : 
-	@$(RM) $(DSRC)/main.c
+	@$(RM) $(DSRC)/main.o $(DSRC)/main.c
 

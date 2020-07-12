@@ -32,7 +32,7 @@ clean :
 install :
 	@rm -rf $(PKGDST) && mkdir -p $(PKGDST) $(DOUT)
 # 1. uncompress
-	@unzip -qo $(PKGSRC) -d $(PKGDST)
+	@unzip -qo $(PKGSRC) -d $(DTMP)
 # 2. patch fixes
 ifdef FIXES
 	@ \

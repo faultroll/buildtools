@@ -4,7 +4,7 @@ DRULE	:=	$(DPRJ)/rule
 
 .PHONY : clean all
 all :
-	@make -j -s -C ./$(DRULE) -f cutest.mak install
+	@make -j -s -C $(DRULE) -f cutest.mak install
 clean :
-	@make -j -s -C ./$(DRULE) -f cutest.mak clean
+	@make -j -s -C $(DRULE) -f cutest.mak clean
 

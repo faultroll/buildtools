@@ -2,65 +2,56 @@
 # # # # # # # # # # # #
 #     平台  规则      #
 # # # # # # # # # # # #
-DPRJ	:=	$(realpath ..)
-DCONF	:=	$(DPRJ)/..
-include $(DCONF)/Platform.conf
+# realpath
+DCONF			?=	.
+include $(DCONF)/platform.conf
 
 # # # # # # # # # # # #
 #     目录  文件      #
 # # # # # # # # # # # #
-DSRC			:=	$(DPRJ)/src
-DFIX			:=	$(DPRJ)/fix
-DOUT			:=	$(DPRJ)/out
-DTMP			:=	$(DPRJ)/tmp
-PKGSRC			:=	$(DSRC)/mxml-2.12.tar.gz
-PKGDST			:=	$(DTMP)/mxml-2.12
-FIXES			:=	
+# output dir
+DOUT			?=	
+# archive
+PKGSRC			?=	
+# uncompressed dir
+PKGDST			?=	
+# patches
+FIXES			?=	
 
 # # # # # # # # # # # #
 #        工具链       #
 # # # # # # # # # # # #
-BFRONT			:=	./configure
-BBACK			:=	make -j
+# eg. tar -xzf $(PKGSRC) -C $(PKGDST)
+BUNCOMPRESS		?=	
+# eg. \
+	./configure --host=$(TARGET) \
+		--prefix=$(DOUT) --exec-prefix=$(DOUT) \
+		--enable-threads --enable-shared
+BBUILDTOOL		?=	
+# eg. make -j8 && make -j8 install
+BTOOLCHAIN		?=	
 
 # # # # # # # # # # # #
 #        伪目标       #
 # # # # # # # # # # # #
-.PHONY : clean install
-clean :
-	@rm -rf $(DOUT)
+.PHONY : install clean
 install :
-	@rm -rf $(PKGDST) && mkdir -p $(PKGDST) $(DOUT)
+	@$(DIR_MK) $(PKGDST) $(DOUT)
 # 1. uncompress
-	@tar -xzf $(PKGSRC) -C $(DTMP)
+	@$(BUNCOMPRESS)
 # 2. patch fixes
 ifdef FIXES
 	@ \
-	cd $(PKGDST)/.. \
+	cd $(PKGDST) \
 	&& \
-	$(foreach fix,$(FIXES),patch -p1 < $(DFIX)/$(fix).patch; )
-else
-	@$(info no fix to patch)
+	$(foreach fix,$(FIXES),patch p1 -i $(fix); )
 endif
 # 3. compile
-	@ \
-	cd $(PKGDST) \
-	&& \
-	$(BFRONT) --host=$(HOST) \
-		--prefix=$(DOUT) --exec-prefix=$(DOUT) \
-		--enable-threads --enable-shared
-	# TODO make patches
-#	@ \
-	sed -i "/^ARFLAGS/c ARFLAGS=-crD" Makefile \
-	sed -i "/^RANLIB/c RANLIB=${PRFX}ranlib -D" Makefile
-	@ \
-	cd $(PKGDST) \
-	&& \
-	$(BBACK) && $(BBACK) -i install # -i ignore warning
-# 4. format
-	@ \
-	cd $(DOUT) \
-	&& \
-	rm  -rf $(DOUT)/bin && rm -rf $(DOUT)/share # delete unneeded
-	@rm -rf $(PKGDST)
-
+ifdef BBUILDTOOL
+	@cd $(PKGDST) && $(BBUILDTOOL)
+endif
+ifdef BTOOLCHAIN
+	@cd $(PKGDST) && $(BTOOLCHAIN)
+endif
+clean :
+	@$(DIR_RM) $(PKGDST) $(DOUT)

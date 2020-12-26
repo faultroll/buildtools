@@ -2,55 +2,40 @@
 # # # # # # # # # # # #
 #     平台  规则      #
 # # # # # # # # # # # #
-DPRJ	:=	$(realpath ..)
-DCONF	:=	$(DPRJ)/..
-include $(DCONF)/Platform.conf
+# platform.conf and rules.mak dir
+DCONF		?=	.
+include $(DCONF)/platform.conf
 
 # # # # # # # # # # # #
 #     目录  文件      #
 # # # # # # # # # # # #
-NAME			:=	rbuf
-DSRC			:=	$(DPRJ)/src
-DINC			:=	$(shell find $(DPRJ)/inc -type d) \
-					$(shell find $(DSRC) -type d)
-DOUT			:=	$(DPRJ)/out
-DLIB			:=	$(shell find $(DPRJ)/lib -type d)
-SRCS_$(NAME)	:=	lrbuf.c
-SRCS			:=	$(foreach file,$(SRCS_$(NAME)),$(wildcard $(DSRC)/$(file)))
-LIBS			:=	-Wl,-Bstatic \
-					 \
-					-Wl,--start-group \
-					 \
-					-Wl,--end-group
-LIBS			+=	-Wl,-Bdynamic \
-					 \
-					-Wl,--start-group \
-					 \
-					-Wl,--end-group
-# must end with dynamic, for libgcc_s
-LIBS			+=	-Wl,-Bdynamic
+# $(NAME).elf or lib$(NAME).a/.so
+NAME		?=	
+# .h dirs
+DINC		?=	
+# output .elf/.a/.so dirs
+DOUT		?=	
+# thirdparty .a/.so dirs
+DLIB		?=	
+# .c/.cc files
+SRCS		?=	
+# must link with libstdc++ if using c++, for gcc link instead of g++ link
+LIBS		?=	
 
 # # # # # # # # # # # #
 #      编译选项       #
 # # # # # # # # # # # #
-# 以下平台无关
-CFLAGS		:=	
-CXXFLAGS	:=	
-# 以下平台相关
-CFLAGS		+=	
-CXXFLAGS	+=	
+CFLAGS		?=	
+CXXFLAGS	?=	
 
 # # # # # # # # # # # #
 #      链接选项       #
 # # # # # # # # # # # #
-# 以下平台无关
-LDFLAGS		:=	
-# 以下平台相关
-LDFLAGS		+=	
+LDFLAGS		?=	
 
 # # # # # # # # # # # #
 #     通用  规则      #
 # # # # # # # # # # # #
-
-include $(DCONF)/Rules.mak
-
+# default target for make cmd, can be lib/elf or your own
+TYPE		?=	help
+include $(DCONF)/rules.mak

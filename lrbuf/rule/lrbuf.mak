@@ -51,8 +51,12 @@ MAKE_CMD	:=	make -j8 -s -C $(DCONF) -f source.mak \
 					DLIB=$(DLIB) SRCS=$(SRCS) LIBS=$(LIBS) \
 					CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) LDFLAGS=$(LDFLAGS)
 
-.PHONY : clean all
+.PHONY : all clean elf lib
 all :
 	@$(MAKE_CMD) all
 clean :
 	@$(MAKE_CMD) clean
+elf :
+	@$(MAKE_CMD) elf
+lib :
+	@$(MAKE_CMD) lib

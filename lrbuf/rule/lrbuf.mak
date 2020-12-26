@@ -1,14 +1,9 @@
 .POSIX	:
 # # # # # # # # # # # #
-#     平台  规则      #
-# # # # # # # # # # # #
-DPRJ	:=	$(realpath ..)
-DCONF	:=	$(DPRJ)/..
-include $(DCONF)/Platform.conf
-
-# # # # # # # # # # # #
 #     目录  文件      #
 # # # # # # # # # # # #
+DCONF			:=	$(realpath ../../makefile)
+DPRJ			:=	$(realpath ..)
 NAME			:=	rbuf
 DSRC			:=	$(DPRJ)/src
 DINC			:=	$(shell find $(DPRJ)/inc -type d) \
@@ -27,8 +22,6 @@ LIBS			+=	-Wl,-Bdynamic \
 					-Wl,--start-group \
 					 \
 					-Wl,--end-group
-# must end with dynamic, for libgcc_s
-LIBS			+=	-Wl,-Bdynamic
 
 # # # # # # # # # # # #
 #      编译选项       #
@@ -51,6 +44,15 @@ LDFLAGS		+=
 # # # # # # # # # # # #
 #     通用  规则      #
 # # # # # # # # # # # #
+TYPE		:=	lib
+MAKE_CMD	:=	make -j8 -s -C $(DCONF) -f source.mak \
+					DCONF=$(DCONF) TYPE=$(TYPE) \
+					NAME=$(NAME) DINC=$(DINC) DOUT=$(DOUT) \
+					DLIB=$(DLIB) SRCS=$(SRCS) LIBS=$(LIBS) \
+					CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) LDFLAGS=$(LDFLAGS)
 
-include $(DCONF)/Rules.mak
-
+.PHONY : clean all
+all :
+	@$(MAKE_CMD) all
+clean :
+	@$(MAKE_CMD) clean

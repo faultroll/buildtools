@@ -1,0 +1,8 @@
+# 忽略所有文件
+*
+# 除了这个文件
+!.gitignore
+# gn files
+!*.gn
+!*.gni
+!*.py

@@ -2,7 +2,7 @@
 # # # # # # # # # # # #
 #     目录  文件      #
 # # # # # # # # # # # #
-DCONF			:=	$(realpath ../../makefile)
+DCONF			:=	$(realpath ../../makerule)
 DPRJ			:=	$(realpath ..)
 DOUT			:=	$(DPRJ)/out
 PKGSRC			:=	$(DPRJ)/src/cutest-1.5.zip

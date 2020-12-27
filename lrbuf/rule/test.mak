@@ -2,9 +2,9 @@
 # # # # # # # # # # # #
 #     目录  文件      #
 # # # # # # # # # # # #
-DCONF			:=	$(realpath ../../makefile)
+DCONF			:=	$(realpath ../../makerule)
 DPRJ			:=	$(realpath ..)
-DCUTEST			:=	$(realpath ../../cutest)
+DCUTEST			:=	$(realpath ../../cutest/out)
 NAME			:=	test_lrbuf
 DSRC			:=	$(DPRJ)/test
 DINC			:=	$(shell find $(DPRJ)/inc -type d) \
@@ -14,7 +14,7 @@ DLIB			:=	$(shell find $(DPRJ)/lib -type d) \
 					$(DOUT)
 SRCS_$(NAME)	:=	test.c main.c
 SRCS			:=	$(foreach file,$(SRCS_$(NAME)),$(wildcard $(DSRC)/$(file)))
-SRCS			+=	$(DCUTEST)/out/CuTest.c
+SRCS			+=	$(DCUTEST)/CuTest.c
 LIBS			:=	-Wl,-Bstatic \
 					 \
 					-Wl,--start-group \
@@ -30,7 +30,7 @@ LIBS			+=	-Wl,-Bdynamic \
 #      编译选项       #
 # # # # # # # # # # # #
 # 以下平台无关
-CFLAGS		:=	-isystem $(DCUTEST)/out
+CFLAGS		:=	-isystem $(DCUTEST)
 CXXFLAGS	:=	
 # 以下平台相关
 CFLAGS		+=	
@@ -51,6 +51,6 @@ TYPE		:=	elf
 include $(DCONF)/source.mak
 .PHONY : test testclean
 test : 
-	@$(DCUTEST)/out/make-tests.sh $(DSRC)/test.c > $(DSRC)/main.c
+	@$(DCUTEST)/make-tests.sh $(DSRC)/test.c > $(DSRC)/main.c
 testclean : 
 	@rm $(DSRC)/main.o $(DSRC)/main.c

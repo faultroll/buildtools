@@ -2,7 +2,7 @@
 # # # # # # # # # # # #
 #     目录  文件      #
 # # # # # # # # # # # #
-DCONF			:=	$(realpath ../../makefile)
+DCONF			:=	$(realpath ../../makerule)
 DPRJ			:=	$(realpath ..)
 NAME			:=	rbuf
 DSRC			:=	$(DPRJ)/src

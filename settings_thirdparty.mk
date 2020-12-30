@@ -1,11 +1,4 @@
-.POSIX	:
-# # # # # # # # # # # #
-#     平台  规则      #
-# # # # # # # # # # # #
-# realpath
-DCONF			?=	.
-include $(DCONF)/platform.conf
-
+.POSIX :
 # # # # # # # # # # # #
 #     目录  文件      #
 # # # # # # # # # # # #
@@ -31,27 +24,11 @@ BBUILDTOOL		?=
 # eg. make -j8 && make -j8 install
 BTOOLCHAIN		?=	
 
+
 # # # # # # # # # # # #
-#        伪目标       #
+#     通用  规则      #
 # # # # # # # # # # # #
-.PHONY : install clean
-install :
-	@$(DIR_MK) $(PKGDST) $(DOUT)
-# 1. uncompress
-	@$(BUNCOMPRESS)
-# 2. patch fixes
-ifdef FIXES
-	@ \
-	cd $(PKGDST) \
-	&& \
-	$(foreach fix,$(FIXES),patch p1 -i $(fix); )
-endif
-# 3. compile
-ifdef BBUILDTOOL
-	@cd $(PKGDST) && $(BBUILDTOOL)
-endif
-ifdef BTOOLCHAIN
-	@cd $(PKGDST) && $(BTOOLCHAIN)
-endif
-clean :
-	@$(DIR_RM) $(PKGDST) $(DOUT)
+# makerules dir
+DRULES		?=	.
+include $(DRULES)/shellutil.mk
+include $(DRULES)/thirdparty.mk

@@ -1,13 +1,5 @@
 .POSIX	:
 # # # # # # # # # # # #
-#      平台变量       #
-# # # # # # # # # # # #
-
-HOST	:=	x86_64-linux-gnu
-TARGET	:=	x86_64-linux-gnu
-# TARGET	:=	aarch64-linux-gnu
-
-# # # # # # # # # # # #
 #        命令行       #
 # # # # # # # # # # # #
 BASH	:=	/bin/bash

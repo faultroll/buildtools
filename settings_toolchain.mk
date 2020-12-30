@@ -1,10 +1,9 @@
-.POSIX	:
+.POSIX :
 # # # # # # # # # # # #
-#     平台  规则      #
+#      平台变量       #
 # # # # # # # # # # # #
-# platform.conf and rules.mak dir
-DCONF		?=	.
-include $(DCONF)/platform.conf
+HOST		?=	
+TARGET		?=	
 
 # # # # # # # # # # # #
 #     目录  文件      #
@@ -38,4 +37,7 @@ LDFLAGS		?=
 # # # # # # # # # # # #
 # default target for make cmd, can be lib/elf or your own
 TYPE		?=	help
-include $(DCONF)/rules.mak
+# makerules dir
+DRULES		?=	.
+include $(DRULES)/shellutil.mk
+include $(DRULES)/toolchain.mk

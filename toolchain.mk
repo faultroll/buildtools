@@ -51,27 +51,31 @@ LIBST		:=	lib$(NAME).a
 # BIN			:=	$(NAME).bin
 # ASM			:=	$(NAME).asm
 ELF			:=	$(NAME).elf
-# DINC, DLIB, DOUT, SRCS, LIBS需存在
+# DINC, DISYS, DLIB, DOUT, SRCS, LIBS需存在
 DIR_INC		:=	$(realpath $(DINC))
+DIR_ISYS	:=	$(realpath $(DISYS))
 DIR_LIB		:=	$(realpath $(DLIB))
 DIR_OUT		:=	$(realpath $(DOUT))
 SOURCES		:=	$(realpath $(SRCS))
 LIBRARYS	:=	$(LIBS) # 不能用realpath，因为不是文件
 LIBRARYS	+=	-Wl,-Bdynamic # must end with dynamic, for libgcc_s
 ifndef DIR_INC
-    $(warning includedir/DINC not defined/found!!!)
+    $(warning <$(NAME)> includedir/DINC not defined/found!!!)
+endif
+ifndef DIR_ISYS
+    $(warning <$(NAME)> sysincdir/DISYS not defined/found!!!)
 endif
 ifndef DIR_LIB
-    $(warning libdir/DLIB not defined/found!!!)
+    $(warning <$(NAME)> libdir/DLIB not defined/found!!!)
 endif
 ifndef DIR_OUT
-    $(error DESTDIR/DOUT not defined/found!!!)
+    $(error <$(NAME)> DESTDIR/DOUT not defined/found!!!)
 endif
 ifndef SOURCES
-    $(error source/SRCS not defined/found!!!)
+    $(error <$(NAME)> source/SRCS not defined/found!!!)
 endif
 ifndef LIBRARYS
-    $(warning library/LIBS not defined!!!)
+    $(warning <$(NAME)> library/LIBS not defined!!!)
 endif
 OBJECTS		:=	$(patsubst %.c,%.o,$(filter %.c, $(SOURCES))) 
 OBJECTS		+=	$(patsubst %.cc,%.o,$(filter %.cc, $(SOURCES))) \
@@ -80,17 +84,17 @@ OBJECTS		+=	$(patsubst %.cc,%.o,$(filter %.cc, $(SOURCES))) \
 # # # # # # # # # # # #
 #      编译选项       #
 # # # # # # # # # # # #
-FLAGS_COMPILE_COMMON	:=	$(addprefix -I,$(DIR_INC))
+FLAGS_COMPILE_COMMON	:=	$(addprefix -isystem ,$(DIR_ISYS)) $(addprefix -I,$(DIR_INC))
 FLAGS_COMPILE_COMMON	+=	-Os -Wall -Wextra -Winvalid-pch -D_POSIX_C_SOURCE=200809L \
 							# -D_XOPEN_SOURCE=700 -D_XOPEN_SOURCE_EXTENDED
 FLAGS_COMPILE_COMMON	+=	-ffunction-sections -fdata-sections
 ifneq ($(TYPE),elf)
-    FLAGS_COMPILE_COMMON	+=	-fPIE
-else
     FLAGS_COMPILE_COMMON	+=	-fPIC
+else
+    FLAGS_COMPILE_COMMON	+=	-fPIE
 endif
 FLAGS_COMPILE_C		:=	-std=c11 -Wpedantic $(FLAGS_COMPILE_PLAT_C) 
-FLAGS_COMPILE_CXX	:=	-std=c++11 -Weffc++ $(FLAGS_COMPILE_PLAT_CXX) 
+FLAGS_COMPILE_CXX	:=	-std=c++11 -Weffc++ -fpermissive $(FLAGS_COMPILE_PLAT_CXX) 
 
 # # # # # # # # # # # #
 #      链接选项       #
@@ -160,6 +164,9 @@ $(ELF) : $(OBJECTS)
 %.o : %.c
 	@$(CC) $(FLAGS_COMPILE_COMMON) $(FLAGS_COMPILE_C) -c $< -o $@
 	$(info $(CC) -c $(notdir $<) -o $(notdir $@))
+%.o : %.cc
+	@$(CXX) $(FLAGS_COMPILE_COMMON) $(FLAGS_COMPILE_CXX) -c $< -o $@
+	$(info $(CXX) -c $(notdir $<) -o $(notdir $@))
 %.o : %.cpp
 	@$(CXX) $(FLAGS_COMPILE_COMMON) $(FLAGS_COMPILE_CXX) -c $< -o $@
 	$(info $(CXX) -c $(notdir $<) -o $(notdir $@))

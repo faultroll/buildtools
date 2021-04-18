@@ -80,6 +80,7 @@ endif
 OBJECTS		:=	$(patsubst %.c,%.o,$(filter %.c, $(SOURCES))) 
 OBJECTS		+=	$(patsubst %.cc,%.o,$(filter %.cc, $(SOURCES))) \
 				$(patsubst %.cpp,%.o,$(filter %.cpp, $(SOURCES))) 
+DEPENDS		:=	$(patsubst %.o,%.d,$(OBJECTS))
 
 # # # # # # # # # # # #
 #      编译选项       #
@@ -162,11 +163,13 @@ $(ELF) : $(OBJECTS)
 	$(info $(CC) $(notdir $^) -o $(notdir $@))
 # OBJ文件
 %.o : %.c
-	@$(CC) $(FLAGS_COMPILE_COMMON) $(FLAGS_COMPILE_C) -c $< -o $@
+	@$(CC) $(FLAGS_COMPILE_COMMON) $(FLAGS_COMPILE_C) -c $< -o $@ -MMD -MF $*.d -MP
 	$(info $(CC) -c $(notdir $<) -o $(notdir $@))
 %.o : %.cc
-	@$(CXX) $(FLAGS_COMPILE_COMMON) $(FLAGS_COMPILE_CXX) -c $< -o $@
+	@$(CXX) $(FLAGS_COMPILE_COMMON) $(FLAGS_COMPILE_CXX) -c $< -o $@ -MMD -MF $*.d -MP
 	$(info $(CXX) -c $(notdir $<) -o $(notdir $@))
 %.o : %.cpp
-	@$(CXX) $(FLAGS_COMPILE_COMMON) $(FLAGS_COMPILE_CXX) -c $< -o $@
+	@$(CXX) $(FLAGS_COMPILE_COMMON) $(FLAGS_COMPILE_CXX) -c $< -o $@ -MMD -MF $*.d -MP
 	$(info $(CXX) -c $(notdir $<) -o $(notdir $@))
+
+-include $(DEPENDS)

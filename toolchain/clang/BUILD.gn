@@ -1,0 +1,10 @@
+
+import("//gn/toolchain/gcc_like_toolchain.gni")
+
+gcc_like_toolchain("clang_target") {
+  cpu = target_cpu
+  os = target_os
+  ar = target_ar
+  cc = target_cc
+  cxx = target_cxx
+}

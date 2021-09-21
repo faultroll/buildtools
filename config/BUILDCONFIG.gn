@@ -3,17 +3,47 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+# guide user to choose compiler/target/...
 declare_args() {
-  ar = "ar"
-  cc = "cc"
-  cxx = "c++"
+  # 1. |toolchain|
+  is_msvc = false # if false, goto |2|, else goto |3|
 
+  # 2. if |1| is true
+  # cc = "cl.exe"
+  # cxx = "cl.exe"
+  # ld = "link.exe"
+  # ar = "lib.exe"
+  # msvc only work when |win-win|, |is_win| is always true, so |win_sdk| and |win_vc| are needed
+  # TODO what about the |uwp|
   win_sdk = "C:/Program Files (x86)/Windows Kits/10"
   win_sdk_version = ""
-
   win_vc = ""
   win_vc_ver = ""
   win_toolchain_version = ""
+
+  # 3. if |1| is false, use |gcc_like_toolchain|
+  # cc = "cc"
+  # cxx = "c++"
+  # ld = "ld"
+  # ar = "ar"
+  prefix = "" # for example, |aarch64-linux-gnu-| for arm64, |arm-none-eabi-| for stm32, ...
+  is_clang = false # some configs only works with |clang|
+  # goto |4|
+
+  # 4. |target_os|
+  is_win = false
+  is_posix = true
+  # TODO support |mac|/|ios|/|android|/...
+  # is_mac = false # need |framework| ?
+  # is_ios = false # need |sdk| ? seems same as mac ?
+  # is_android = false # need |ndk|, the stm32 seems the same, just need lib and lds(-Txxx)
+  # TODO can we extract the |sdk| in |win|/|android|/... to same variable
+  # eg. path/version/...
+
+  # 5. |target_cpu|
+  is_x86 = true # the x86/x64
+  is_arm = false # the arm/arm64, TODO what about |armv7|
+  # TODO support |mips|/|sparc|/|tile|/|loongson|/...
 }
 
 declare_args() {

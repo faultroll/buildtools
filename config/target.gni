@@ -1,0 +1,202 @@
+
+###############################################################################
+# Templates
+#
+
+# Points to // in webrtc stand-alone or to //third_party/webrtc/ in
+# chromium.
+# We need absolute paths for all configs in templates as they are shared in
+# different subdirectories.
+webrtc_root = get_path_info(".", "abspath")
+
+# Global configuration that should be applied to all WebRTC targets.
+# You normally shouldn't need to include this in your target as it's
+# automatically included when using the rtc_* templates.
+# It sets defines, include paths and compilation warnings accordingly,
+# both for WebRTC stand-alone builds and for the scenario when WebRTC
+# native code is built as part of Chromium.
+rtc_common_configs = [ webrtc_root + ":common_config" ]
+
+if (is_mac || is_ios) {
+  rtc_common_configs += [ "//build/config/compiler:enable_arc" ]
+}
+
+# Global public configuration that should be applied to all WebRTC targets. You
+# normally shouldn't need to include this in your target as it's automatically
+# included when using the rtc_* templates. It set the defines, include paths and
+# compilation warnings that should be propagated to dependents of the targets
+# depending on the target having this config.
+rtc_common_inherited_config = webrtc_root + ":common_inherited_config"
+
+# Common configs to remove or add in all rtc targets.
+rtc_remove_configs = []
+rtc_add_configs = rtc_common_configs
+
+set_defaults("rtc_source_set") {
+  configs = rtc_add_configs
+  suppressed_configs = []
+}
+
+set_defaults("rtc_executable") {
+  configs = rtc_add_configs
+  suppressed_configs = []
+}
+
+set_defaults("rtc_static_library") {
+  configs = rtc_add_configs
+  suppressed_configs = []
+}
+
+set_defaults("rtc_shared_library") {
+  configs = rtc_add_configs
+  suppressed_configs = []
+}
+
+webrtc_default_visibility = [ webrtc_root + "/*" ]
+if (build_with_chromium) {
+  # Allow Chromium's WebRTC overrides targets to bypass the regular
+  # visibility restrictions.
+  webrtc_default_visibility += [ webrtc_root + "/../webrtc_overrides/*" ]
+}
+
+template("rtc_source_set") {
+  source_set(target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "configs",
+                             "public_configs",
+                             "suppressed_configs",
+                             "visibility",
+                           ])
+    forward_variables_from(invoker, [ "visibility" ])
+    if (!defined(visibility)) {
+      visibility = webrtc_default_visibility
+    }
+    configs += invoker.configs
+    configs -= rtc_remove_configs
+    configs -= invoker.suppressed_configs
+    public_configs = [ rtc_common_inherited_config ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}
+
+template("rtc_executable") {
+  executable(target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "deps",
+                             "configs",
+                             "public_configs",
+                             "suppressed_configs",
+                             "visibility",
+                           ])
+    forward_variables_from(invoker, [ "visibility" ])
+    if (!defined(visibility)) {
+      visibility = webrtc_default_visibility
+    }
+    configs += invoker.configs
+    configs -= rtc_remove_configs
+    configs -= invoker.suppressed_configs
+    deps = [
+      "//build/config:exe_and_shlib_deps",
+    ]
+    deps += invoker.deps
+
+    public_configs = [ rtc_common_inherited_config ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}
+
+template("rtc_static_library") {
+  static_library(target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "configs",
+                             "public_configs",
+                             "suppressed_configs",
+                             "visibility",
+                           ])
+    forward_variables_from(invoker, [ "visibility" ])
+    if (!defined(visibility)) {
+      visibility = webrtc_default_visibility
+    }
+    configs += invoker.configs
+    configs -= rtc_remove_configs
+    configs -= invoker.suppressed_configs
+    public_configs = [ rtc_common_inherited_config ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}
+
+template("rtc_shared_library") {
+  shared_library(target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "configs",
+                             "public_configs",
+                             "suppressed_configs",
+                             "visibility",
+                           ])
+    forward_variables_from(invoker, [ "visibility" ])
+    if (!defined(visibility)) {
+      visibility = webrtc_default_visibility
+    }
+    configs += invoker.configs
+    configs -= rtc_remove_configs
+    configs -= invoker.suppressed_configs
+    public_configs = [ rtc_common_inherited_config ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}
+
+  template("ios_framework_bundle_with_umbrella_header") {
+    forward_variables_from(invoker, [ "output_name" ])
+    umbrella_header_path =
+        "$target_gen_dir/$output_name.framework/Headers/$output_name.h"
+
+    ios_framework_bundle(target_name) {
+      forward_variables_from(invoker, "*", [])
+
+      deps += [ ":copy_umbrella_header_$target_name" ]
+    }
+
+    # action("umbrella_header_$target_name") {
+    #   forward_variables_from(invoker, [ "public_headers" ])
+
+    #   script = "//tools_webrtc/ios/generate_umbrella_header.py"
+
+    #   outputs = [
+    #     umbrella_header_path,
+    #   ]
+    #   args = [
+    #            "--out",
+    #            rebase_path(umbrella_header_path, root_build_dir),
+    #            "--sources",
+    #          ] + rebase_path(public_headers, "objc/Framework/Headers/")
+    # }
+
+    copy("copy_umbrella_header_$target_name") {
+      sources = [
+        umbrella_header_path,
+      ]
+      outputs = [
+        "$root_out_dir/$output_name.framework/Headers/$output_name.h",
+      ]
+
+      deps = [
+        ":umbrella_header_$target_name",
+      ]
+    }
+  }
